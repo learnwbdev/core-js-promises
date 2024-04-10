@@ -41,7 +41,9 @@ function getPromise(number) {
  */
 function getPromiseResult(source) {
   return new Promise((resolve) => {
-    source.then(() => resolve('success')).catch(() => resolve('fail'));
+    const successCallback = () => resolve('success');
+    const failureCallback = () => resolve('fail');
+    source.then(successCallback, failureCallback);
   });
 }
 
