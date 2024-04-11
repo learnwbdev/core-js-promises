@@ -144,21 +144,17 @@ function getAllResult(promises) {
  * [promise1, promise4, promise3, promise2] => Promise.resolved('10403020')
  */
 function queuPromises(promises) {
-  return new Promise((resolve) => {
-    let resultStr = '';
-    const createPromiseChain = (idx) => {
-      promises[idx].then((result) => {
-        resultStr = resultStr.concat(result);
-        const nextIdx = idx + 1;
-        if (nextIdx < promises.length) {
-          createPromiseChain(nextIdx);
-        } else {
-          resolve(resultStr);
-        }
-      });
-    };
-    createPromiseChain(0);
-  });
+  const getNextPromise = (prevResult, nextPromise) =>
+    new Promise((resolve) => {
+      const successCallback = (result) => `${prevResult}${result}`;
+      resolve(nextPromise.then(successCallback));
+    });
+
+  const promisesChain = promises.reduce((prevPromise, currPromise) =>
+    prevPromise.then((result) => getNextPromise(result, currPromise))
+  );
+
+  return promisesChain;
 }
 
 module.exports = {
